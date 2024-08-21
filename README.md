@@ -21,3 +21,11 @@ Registrar información personal del alumno y la hora de ingreso al salón.
 
 # Alcance
 Actualización Instantánea: La asistencia puede ser registrada y actualizada en tiempo real, proporcionando a los administradores y profesores información inmediata sobre la presencia de los estudiantes.  
+
+# Integrantes
+
+Carlos Daniel García Alarcón
+
+Fiorela Angelica Ochoa González
+
+Diego Arias Hernández
