@@ -9,16 +9,16 @@ $revisar = $mysqli -> query("SELECT * FROM tbl_usuarios WHERE correo = '$correo'
 if($dato = $revisar -> fetch_array()){
 if($contraseña == $dato['contraseña']){
 	echo '<script>alert("Bienvenido al Menu")</script>';
-	echo "<script>location.href='index.php'</script>";
+	echo "<script>location.href='indexx.php'</script>";
 }
 else{
 	echo '<script>alert("La Contraseña es Incorrecta")</script>';
-	echo "<script>location.href='login1.php'</script>";
+	echo "<script>location.href='login.php'</script>";
  }
 
 }
 else{
 	echo '<script>alert("El Usuario es Incorrecto")</script>';
-	echo "<script>location.href='login1.php'</script>";
+	echo "<script>location.href='login.php'</script>";
 }
 ?>
