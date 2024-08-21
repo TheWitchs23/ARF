@@ -1,0 +1,95 @@
+import os
+import sys
+import requests
+from datetime import datetime
+from deepface import DeepFace
+import paho.mqtt.client as mqtt
+
+# MQTT configuration
+MQTT_BROKER = "localhost"  # You can change this to your own broker
+MQTT_PORT = 1883
+MQTT_TOPIC = "codigoIoT/caras/reconocido"
+
+def capture_image(esp32cam_ip):
+    # Define the URL to capture the image
+    capture_url = f"http://{esp32cam_ip}/capture"
+    
+    # Send a request to the ESP32-CAM to capture the image
+    response = requests.get(capture_url)
+    
+    if response.status_code == 200:
+        # Generate a filename with a timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"temp/{timestamp}.jpg"
+        
+        # Save the image to the specified directory
+        os.makedirs("temp", exist_ok=True)
+        with open(filename, 'wb') as file:
+            file.write(response.content)
+        
+        print(f"Image captured and saved to {filename}")
+        return filename
+    else:
+        print("Failed to capture image from ESP32-CAM")
+        return None
+
+def compare_faces(captured_image_path):
+    database_path = "baseDeDatos"
+    recognized = False
+    
+    # Iterate through each person folder in the database
+    for person_name in os.listdir(database_path):
+        person_dir = os.path.join(database_path, person_name)
+        
+        if os.path.isdir(person_dir):
+            # Iterate through each image file in the person's directory
+            for img_file in os.listdir(person_dir):
+                img_path = os.path.join(person_dir, img_file)
+                
+                # Compare the captured image with the current image in the database
+                try:
+                    result = DeepFace.verify(captured_image_path, img_path, enforce_detection=False)
+                    if result["verified"]:
+                        print(f"Person recognized as {person_name}")
+                        recognized = True
+                        break
+                except Exception as e:
+                    print(f"Error comparing images: {e}")
+                    continue
+        
+        if recognized:
+            break
+    
+    return recognized
+
+def send_mqtt_message(recognized):
+    # Initialize MQTT client
+    client = mqtt.Client()
+    client.connect(MQTT_BROKER, MQTT_PORT, 60)
+    
+    # Send message based on recognition result
+    if recognized:
+        client.publish(MQTT_TOPIC, "True")
+        print("MQTT message sent: True")
+    else:
+        client.publish(MQTT_TOPIC, "False")
+        print("MQTT message sent: False")
+    
+    client.disconnect()
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python recognize_person.py esp32cam_ip")
+        sys.exit(1)
+    
+    esp32cam_ip = sys.argv[1]
+    
+    # Capture the image from ESP32-CAM
+    captured_image_path = capture_image(esp32cam_ip)
+    
+    if captured_image_path:
+        # Compare the captured image with the database
+        recognized = compare_faces(captured_image_path)
+        
+        # Send the recognition result via MQTT
+        send_mqtt_message(recognized)
