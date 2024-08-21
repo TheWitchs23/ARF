@@ -10,9 +10,13 @@ Implementar una solución tecnológica de reconocimiento facial integrada a IoT 
 # Los objetivos Genereales
 
 Desarrollar el reconocimiento facial en donde se realizará la asistencia.	
+
 Diseñar una interfaz de usuario intuitiva para que los profesores puedan verificar y corregir la asistencia registrada manualmente en caso de errores.	
+
 Recopilar las asistencias guardadas, las cuales se enviará al sistema web.	
+
 Guardar la información de los alumnos en caso de no haber Internet, una vez que regrese se enviarán los datos.	
+
 Registrar información personal del alumno y la hora de ingreso al salón.	
 
 # Alcance
